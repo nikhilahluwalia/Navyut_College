@@ -35,9 +35,3 @@ If you prefer to run the SQL manually, you can:
 2. Connect to your database
 3. Run the SQL from `database/schema.sql`
 
-## Next Steps
-
-After creating tables, remember to:
-1. Install bcrypt for password hashing: `npm install bcrypt`.
-2. Update your authController to hash passwords
-3. Implement proper validation

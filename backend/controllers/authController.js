@@ -1,5 +1,5 @@
 export const login = (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
 
 }
