@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import sqlConnection from '../config/db.js';
 import { generateToken } from '../utils/jwt.js';
+import e from 'express';
 
 export const login = async (req, res) => {
   try {
@@ -150,6 +151,43 @@ export const register = async (req, res) => {
     res.status(500).json({ 
       success: false,
       message: "Server error" 
+    });
+  }
+};
+
+
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    // Check if user exists
+    const query = 'SELECT * FROM users WHERE email = ?';
+    sqlConnection.query(query, [email], async (err, results) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ 
+          success: false,
+          message: "Server error" 
+        });
+      }
+      if (results.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "User with this email does not exist"
+        });
+      }
+      // Here you would typically generate a password reset token and send an email
+      res.status(200).json({
+        success: true,
+        message: "Password reset link has been sent to your email (simulated)"
+      });
+    }   
+  )
+}catch (error) {
+    console.error('Forgot Password error:', error);
+    res.status(500).json({
+      success: false,
+      message: "Server error"
     });
   }
 };
