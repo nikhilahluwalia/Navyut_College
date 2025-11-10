@@ -4,7 +4,7 @@ export const login = (req, res) => {
 
 }
 
-export const register = (req,res) =>{
+export const register = async(req,res) =>{
     const { email , name , phoneNumber , password } = req.body;
 
 if(!email  || !name || !phoneNumber || !password){
@@ -12,6 +12,7 @@ if(!email  || !name || !phoneNumber || !password){
 };
 
 
+res.status(201).json({ message: "User registered successfully" });
 
 
 }
