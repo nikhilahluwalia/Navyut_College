@@ -20,7 +20,7 @@ export const isValidName = (name) => {
 };
 
 export const isValidRole = (role) => {
-  const validRoles = ['manager', 'career_counciler', 'student'];
+  const validRoles = ['student']; // Only allow 'student' role for regular users
   return validRoles.includes(role);
 };
 

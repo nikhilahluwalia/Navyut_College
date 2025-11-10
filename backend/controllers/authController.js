@@ -99,7 +99,7 @@ export const register = async (req, res) => {
 
       // Insert user into database
       const insertQuery = 'INSERT INTO users (name, email, phone_number, password, role) VALUES (?, ?, ?, ?, ?)';
-      const userRole = role || 'student'; // Default role is student
+      const userRole = req.user && req.user.role === 'admin' ? role : 'student'; // Only allow admin to assign roles other than student
 
       sqlConnection.query(
         insertQuery,
