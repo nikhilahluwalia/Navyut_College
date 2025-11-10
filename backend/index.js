@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import sqlConnection from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
+import protectedRoutes from './routes/protectedRoutes.js';
 import { errorHandler, notFound } from './middlewares/errorHandler.js';
 
 
@@ -34,6 +35,7 @@ app.get('/', (req, res) => {
 
 
 app.use("/api/auth" , authRoutes);
+app.use("/api/user" , protectedRoutes);
 
 // Error handling middlewares (must be last)
 app.use(notFound);

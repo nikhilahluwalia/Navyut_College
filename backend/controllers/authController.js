@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import sqlConnection from '../config/db.js';
+import { generateToken } from '../utils/jwt.js';
 
 export const login = async (req, res) => {
   try {
@@ -42,12 +43,20 @@ export const login = async (req, res) => {
         });
       }
 
+      // Generate JWT token
+      const token = generateToken({
+        userId: user.id,
+        email: user.email,
+        role: user.role
+      });
+
       // Remove password from response
       const { password: _, ...userWithoutPassword } = user;
 
       res.status(200).json({
         success: true,
         message: "Login successful",
+        token,
         user: userWithoutPassword
       });
     });
@@ -113,10 +122,24 @@ export const register = async (req, res) => {
             });
           }
 
+          // Generate JWT token for the newly registered user
+          const token = generateToken({
+            userId: insertResults.insertId,
+            email: email,
+            role: userRole
+          });
+
           res.status(201).json({
             success: true,
             message: "User registered successfully",
-            userId: insertResults.insertId
+            token,
+            user: {
+              id: insertResults.insertId,
+              name,
+              email,
+              phoneNumber,
+              role: userRole
+            }
           });
         }
       );

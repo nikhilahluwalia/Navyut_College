@@ -1,4 +1,123 @@
 
+// API Configuration
+const API_BASE_URL = 'http://localhost:3000/api';
+
+// Helper function to get token from localStorage
+const getAuthToken = () => {
+  return localStorage.getItem('token');
+};
+
+// Helper function to create headers with authentication
+const getHeaders = () => {
+  const token = getAuthToken();
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
+  return headers;
+};
+
+// API call wrapper with error handling
+const apiCall = async (url, options = {}) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}${url}`, {
+      ...options,
+      headers: getHeaders(),
+    });
+
+    const data = await response.json();
+
+    // Handle token expiration
+    if (response.status === 403 || response.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+      throw new Error(data.message || 'Authentication failed');
+    }
+
+    if (!response.ok) {
+      throw new Error(data.message || 'API request failed');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+};
+
+// Auth Service
+export const authService = {
+  login: async (email, password) => {
+    const data = await apiCall('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+    
+    if (data.success && data.token) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+    }
+    
+    return data;
+  },
+
+  register: async (userData) => {
+    const data = await apiCall('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    });
+    
+    if (data.success && data.token) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+    }
+    
+    return data;
+  },
+
+  logout: () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/login';
+  },
+
+  getCurrentUser: () => {
+    const userStr = localStorage.getItem('user');
+    return userStr ? JSON.parse(userStr) : null;
+  },
+
+  isAuthenticated: () => {
+    return !!getAuthToken();
+  },
+};
+
+// Protected API Service (requires authentication)
+export const protectedService = {
+  getProfile: async () => {
+    return await apiCall('/user/profile', {
+      method: 'GET',
+    });
+  },
+
+  getAdminDashboard: async () => {
+    return await apiCall('/user/admin/dashboard', {
+      method: 'GET',
+    });
+  },
+
+  getStaffData: async () => {
+    return await apiCall('/user/staff/data', {
+      method: 'GET',
+    });
+  },
+};
+
+// Mock data for colleges and users (keeping for backward compatibility)
  export const mockData = {
     totalColleges: 156,
     totalUsers: 12458,
