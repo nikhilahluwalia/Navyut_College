@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import sqlConnection from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
+import { errorHandler, notFound } from './middlewares/errorHandler.js';
 
 
 dotenv.config();
@@ -24,11 +25,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.json({ 
+    success: true,
+    message: 'Navyut College API',
+    version: '1.0.0'
+  });
 });
 
 
 app.use("/api/auth" , authRoutes);
+
+// Error handling middlewares (must be last)
+app.use(notFound);
+app.use(errorHandler);
 
 
 app.listen(PORT, () => {
